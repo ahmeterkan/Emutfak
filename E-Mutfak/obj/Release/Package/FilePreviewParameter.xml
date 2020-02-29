@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="IIS Web Application Name" description="" value="E-Mutfak20200227062005" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\Ahmet\\source\\repos\\E-Mutfak\\E-Mutfak\\obj\\Release\\Package\\PackageTmp$" />
+    <parameterEntry kind="ProviderPath" scope="setAcl" match="^C:\\Users\\Ahmet\\source\\repos\\E-Mutfak\\E-Mutfak\\obj\\Release\\Package\\PackageTmp$" />
+  </parameter>
+  <parameter name="MyDbConnection-Web.config Connection String" description="" value="Data Source=(localdb)\MSSQLLocalDB; Integrated Security=True; MultipleActiveResultSets=True; AttachDbFilename=|DataDirectory|MyDatabaseContext-12.mdf" tags="">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\Ahmet\\source\\repos\\E-Mutfak\\E-Mutfak\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MyDbConnection']/@connectionString" />
+  </parameter>
+</parameters>

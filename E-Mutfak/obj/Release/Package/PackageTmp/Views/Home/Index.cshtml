@@ -1,0 +1,158 @@
+﻿@using E_Mutfak.Models
+@model IEnumerable<User>
+@{
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/gridstly.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+
+<!-- postback yapmadan yapılan işlemin sonuçlarını post edildiği script-->
+<script src="~/Scripts/gridjavascript.js"></script>
+
+<h2>Index</h2>
+
+<p>
+    <a href="/Home/Create" class="btn btn-primary">Ekle</a>
+</p>
+
+
+@{
+    decimal tlFiyat;
+
+    var grid = new WebGrid(Model);
+
+    List<SelectListItem> listItems = new List<SelectListItem>();
+
+    listItems.Add(new SelectListItem
+    {
+        Text = "Euro",
+        Value = "1"
+    });
+    listItems.Add(new SelectListItem
+    {
+        Text = "Dolar",
+        Value = "2"
+    });
+
+}
+
+
+<div id="gridContent" style=" padding:20px; ">
+    @grid.GetHtml(
+            tableStyle: "webgrid-table",
+            headerStyle: "webgrid-header",
+            footerStyle: "webgrid-footer",
+            alternatingRowStyle: "webgrid-alternating-row",
+            selectedRowStyle: "webgrid-selected-row",
+            rowStyle: "webgrid-row-style",
+            mode: WebGridPagerModes.All,
+            columns:
+grid.Columns(
+
+grid.Column("Id", format: @<text>
+        <span class=" "><label id="UserID">@item.Id</label></span>
+</text>, style: "col50Width"),
+
+
+grid.Column("TC Kimlik No", format: @<text>
+            <span class="display-mode"><label id="lblTCKN">@item.TCKN</label></span>
+            <input type="text" id="TCKN" value="@item.TCKN" class="edit-mode" style="width: 100px; " />
+            <div class="display-mode edit-mode text-uppercase text-danger " id="TCKNh6"> </div>
+</text>, style: "col150Width"),
+
+
+grid.Column("AdSoyad", "Ad Soyad", format: @<text>
+            <span class="display-mode"><label id="lblAdSoyad">@item.AdSoyad</label></span>
+            <input type="text" id="AdSoyad" value="@item.AdSoyad" class="edit-mode" />
+</text>, style: "col200Width"),
+
+
+grid.Column("Sifre", "Şifre", format: @<text>
+            <span class="display-mode"> <label id="lblSifre">@item.Sifre</label></span>
+            <input type="text" id="Sifre" value="@item.Sifre" class="edit-mode" />
+</text>, style: "col200Width"),
+
+
+grid.Column("Fiyat", "Fiyat", format: @<text>
+            <span class="display-mode"> <label id="lblFiyat">@item.Fiyat</label> </span>
+            <input type="text" id="Fiyat" value="@item.Fiyat" class="edit-mode" style="width: 100px; " />
+</text>, style: "col100Width"),
+
+
+grid.Column("paraBirimi", "Para Birimi", format: @<text>
+            <span class="display-mode"> <label id="lblparaBirimi">@item.paraBirimi</label> </span>
+            @Html.DropDownList("Exemplo", new SelectList(listItems, "Value", "Text"), htmlAttributes: new { @class = "edit-mode", @id = "paraBirimi", @style = "width: 100px; " })
+</text>, style: "col100Width"),
+
+
+grid.Column("tlFiyat", "TL Fiyatı", format: @<text>@{
+                            if (item.paraBirimi == Doviz.Dolar)
+                            {
+                                tlFiyat = item.Fiyat * 6;
+                            }
+                            else
+                            {
+                                tlFiyat = item.Fiyat * 7;
+                            }
+}
+<span class="display-mode"> <label id="lbltlFiyat">@tlFiyat</label> </span>
+<input type="text" id="tlFiyat" value="@tlFiyat" class="edit-mode" style="width: 100px; " />
+</text>, style: "col150Width"),
+
+
+grid.Column(" ", format: @<text>
+            <button class="edit-user display-mode btn btn-info btn-sm">Edit</button>
+            <a href="/Home/Delete/@item.Id" class=" display-mode btn btn-danger btn-sm">Sil</a>
+            <button class="save-user edit-mode btn btn-success btn-sm">Save</button>
+            <button class="cancel-user edit-mode btn btn-danger btn-sm">Cancel</button>
+</text>, style: "col200Width", canSort: false)
+))
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"
+        integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="
+        crossorigin="anonymous"></script>
+
+<!-- tc kimlik kontrolü-->
+<script>
+
+        $("document").ready(function () {
+
+            var checkTcNum = function (value) {
+                value = value.toString();
+                var isEleven = /^[0-9]{11}$/.test(value);
+                var totalX = 0;
+                for (var i = 0; i < 10; i++) {
+                    totalX += Number(value.substr(i, 1));
+                }
+                var isRuleX = totalX % 10 == value.substr(10, 1);
+                var totalY1 = 0;
+                var totalY2 = 0;
+                for (var i = 0; i < 10; i += 2) {
+                    totalY1 += Number(value.substr(i, 1));
+                }
+                for (var i = 1; i < 10; i += 2) {
+                    totalY2 += Number(value.substr(i, 1));
+                }
+                var isRuleY = ((totalY1 * 7) - totalY2) % 10 == value.substr(9, 0);
+                return isEleven && isRuleX && isRuleY;
+            };
+
+        //$("input").click(function () {
+            $("input#TCKN").on('keyup focus blur load', function (event) {
+                event.preventDefault();
+                var isValid = checkTcNum($(this).val());
+                console.log('isValid ', isValid);
+                if (isValid) {
+                    $('div#TCKNh6').text("TRUE").attr('class', 'text-uppercase text-success');
+                }
+                else {
+                    $('div#TCKNh6').text("FALSE").attr('class', 'text-uppercase text-danger');
+                }
+            });
+        });
+    //});
+</script>
+
+
+<!-- tc kimlik kontrolü-->
